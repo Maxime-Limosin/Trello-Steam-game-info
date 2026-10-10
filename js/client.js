@@ -9,23 +9,24 @@ function mapGameToBadges(game) {
   const badges = []
 
   // Price Badge
+  console.log(game.price)
   badges.push({
-    text: game.priceBadgeText,
-    color: game.isOnSale ? 'green' : 'gray'
+    text: createPriceText(game),
+    color: game.isOnSale ? 'green' : 'light-gray'
   })
 
   // Review Badge
-  if (game.reviewText) {
+  if (game.reviewScorePercent >= 0) {
     badges.push({
-      text: game.reviewText,
-      color: 'blue'
+      text: createReviewText(game),
+      color: game.reviewScorePercent >= 70 ? 'blue' : 'red'
     })
   }
 
   // Demo Badge
   if (game.hasDemo) {
     badges.push({
-      text: 'Démo dispo',
+      text: 'Demo',
       color: 'yellow'
     })
   }
@@ -50,3 +51,19 @@ TrelloPowerUp.initialize({
       })
   }
 })
+
+function createPriceText(game) {
+  if (game.price < 0)
+    return 'Free'
+
+  if (game.isOnSale)
+    return `${game.price}€ (-${game.discountPercent}%)`
+  
+  return `${game.price}€`
+}
+
+function createReviewText(game) {
+  if (game.reviewScorePercent < 0)
+    return ''
+  return `${game.reviewScorePercent}% Positive`
+}

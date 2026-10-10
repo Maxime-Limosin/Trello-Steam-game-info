@@ -33,11 +33,11 @@ export class SteamService {
       const rawGame = data.store.data
 
       // Extract price info
-      let priceText = 'Free'
+      let priceEuros = -1
       let discountPercent = 0
 
       if (!rawGame.is_free && rawGame.price_overview) {
-        priceText = rawGame.price_overview.final_formatted
+        priceEuros = rawGame.price_overview.final/100 // Convert raw 1999 to 19,99
         discountPercent = rawGame.price_overview.discount_percent || 0
       }
 
@@ -45,21 +45,20 @@ export class SteamService {
       const hasDemo = Array.isArray(rawGame.demos) && rawGame.demos.length > 0
 
       // Fetch review score
-      let reviewText = null
+      let reviewScorePercent = -1
       if (data.reviews && data.reviews.total_reviews > 0) {
         const { total_reviews: total, total_positive: positive } = data.reviews
-        const scorePercent = Math.round((positive / total) * 100)
-        reviewText = `${scorePercent}% Positive`
+        reviewScorePercent = Math.round((positive / total) * 100)
       }
 
       const steamGame = new Game({
         appId,
         url,
         name: rawGame.name,
-        priceText,
+        price: priceEuros,
         discountPercent,
         hasDemo,
-        reviewText
+        reviewScorePercent
       })
 
       // Save to cache
