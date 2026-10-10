@@ -14,6 +14,28 @@ export class SteamService {
     return match ? match[1] : null
   }
 
+  async searchGameByName(title) {
+    if (!title)
+      return null
+
+    try {
+      const response = await fetch(`${this.workerUrl}?search=${encodeURIComponent(title)}`)
+      if (!response.ok) return null
+
+      const data = await response.json()
+
+      if (!data.appId)
+        return null
+
+      const steamUrl = `https://store.steampowered.com/app/${data.appId}/`      
+      return await this.getGameInfo(steamUrl)
+
+    } catch (error) {
+      console.error(`[SteamService] Error searching game for "${title}":`, error)
+      return null
+    }
+  }
+
   async getGameInfo(url) {
     const appId = this.extractAppId(url)
     if (!appId) return null
@@ -56,9 +78,9 @@ export class SteamService {
       const releaseDate = rawGame.release_date.date
 
       // Header image
-      const fallbackCdn = `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`
+      const image = `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`
       const defaultPlaceholder = "https://miro.medium.com/1*uU4MEsmHWbDltSsJCwjoCw.jpeg"
-      const headerImage = rawGame.header_image || fallbackCdn || defaultPlaceholder // Try another API if steam failed, otherwise display a default picture
+      const headerImage = image || defaultPlaceholder // Try another API if steam failed, otherwise display a default picture
 
       const steamGame = new Game({
         appId,

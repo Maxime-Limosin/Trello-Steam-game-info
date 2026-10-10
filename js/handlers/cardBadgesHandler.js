@@ -1,17 +1,31 @@
 import { ensureCardCover } from './coverHandler.js'
 
 export async function getCardBadges(t, steamService) {
-  const card = await t.card('attachments', 'cover')
+  const card = await t.card('name', 'attachments', 'cover')
 
   const steamAttachment = card.attachments.find(att =>
     att.url && att.url.includes('store.steampowered.com/app/'))
 
-  if (!steamAttachment)
-    return []
+  let game = null
 
-  const game = await steamService.getGameInfo(steamAttachment.url)
-  if (!game)
-    return []
+  if (steamAttachment) {
+    game = await steamService.getGameInfo(steamAttachment.url)
+  } else {
+    game = await steamService.searchGameByName(card.name)
+
+    if (game && game.url) {
+      try {
+        await t.attach({
+          name: game.name,
+          url: game.url
+        })
+      } catch (err) {
+        console.error('[CardBadges] Error attaching Steam URL:', err)
+      }
+    }
+  }
+
+  if (!game) return []
 
   await ensureCardCover(t, game, card)
   return mapGameToBadges(game)
