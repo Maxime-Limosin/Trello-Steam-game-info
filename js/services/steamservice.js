@@ -51,6 +51,10 @@ export class SteamService {
         reviewScorePercent = Math.round((positive / total) * 100)
       }
 
+      // Fetch release info
+      const released = !rawGame.release_date.coming_soon
+      const releaseDate = rawGame.release_date.date
+
       const steamGame = new Game({
         appId,
         url,
@@ -58,7 +62,9 @@ export class SteamService {
         price: priceEuros,
         discountPercent,
         hasDemo,
-        reviewScorePercent
+        reviewScorePercent,
+        released,
+        releaseDate
       })
 
       // Save to cache

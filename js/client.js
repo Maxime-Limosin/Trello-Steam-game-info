@@ -9,10 +9,9 @@ function mapGameToBadges(game) {
   const badges = []
 
   // Price Badge
-  console.log(game.price)
   badges.push({
     text: createPriceText(game),
-    color: game.isOnSale ? 'green' : 'light-gray'
+    color: game.isOnSale || game.price <= 0 ? 'green' : 'light-gray'
   })
 
   // Review Badge
@@ -28,6 +27,14 @@ function mapGameToBadges(game) {
     badges.push({
       text: 'Demo',
       color: 'yellow'
+    })
+  }
+
+  // Release date Badge
+  if (!game.released) {
+    badges.push({
+      text: game.releaseDate,
+      color: 'orange'
     })
   }
 
