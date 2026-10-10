@@ -1,76 +1,11 @@
 import { SteamService } from './services/steamservice.js'
+import { getCardBadges } from './handlers/cardBadgesHandler.js'
 
-// Initialize the service instance
 const steamService = new SteamService()
 
-function mapGameToBadges(game) {
-  if (!game) return []
-
-  const badges = []
-
-  // Price Badge
-  badges.push({
-    text: createPriceText(game),
-    color: game.isOnSale || game.price <= 0 ? 'green' : 'light-gray'
-  })
-
-  // Review Badge
-  if (game.reviewScorePercent >= 0) {
-    badges.push({
-      text: createReviewText(game),
-      color: game.reviewScorePercent >= 70 ? 'blue' : 'red'
-    })
-  }
-
-  // Demo Badge
-  if (game.hasDemo) {
-    badges.push({
-      text: 'Demo',
-      color: 'yellow'
-    })
-  }
-
-  // Release date Badge
-  if (!game.released) {
-    badges.push({
-      text: game.releaseDate,
-      color: 'orange'
-    })
-  }
-
-  return badges
-}
-
-// Register Trello Power-Up capabilities
+// Bind handlers to Trello
 TrelloPowerUp.initialize({
   'card-badges': function(t, options) {
-    return t.card('attachments')
-      .then(async function(card) {
-        // Find the first Steam attachment link on the card
-        const steamAttachment = card.attachments.find(att => 
-          att.url && att.url.includes('store.steampowered.com/app/')
-        )
-
-        if (!steamAttachment) return []
-
-        const game = await steamService.getGameInfo(steamAttachment.url)
-        return mapGameToBadges(game)
-      })
+    return getCardBadges(t, steamService)
   }
 })
-
-function createPriceText(game) {
-  if (game.price < 0)
-    return 'Free'
-
-  if (game.isOnSale)
-    return `${game.price}€ (-${game.discountPercent}%)`
-  
-  return `${game.price}€`
-}
-
-function createReviewText(game) {
-  if (game.reviewScorePercent < 0)
-    return ''
-  return `${game.reviewScorePercent}% Positive`
-}

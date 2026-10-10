@@ -55,6 +55,11 @@ export class SteamService {
       const released = !rawGame.release_date.coming_soon
       const releaseDate = rawGame.release_date.date
 
+      // Header image
+      const fallbackCdn = `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`
+      const defaultPlaceholder = "https://miro.medium.com/1*uU4MEsmHWbDltSsJCwjoCw.jpeg"
+      const headerImage = rawGame.header_image || fallbackCdn || defaultPlaceholder // Try another API if steam failed, otherwise display a default picture
+
       const steamGame = new Game({
         appId,
         url,
@@ -64,7 +69,8 @@ export class SteamService {
         hasDemo,
         reviewScorePercent,
         released,
-        releaseDate
+        releaseDate,
+        headerImage
       })
 
       // Save to cache
@@ -72,7 +78,7 @@ export class SteamService {
       return steamGame
 
     } catch (error) {
-      console.error(`[SteamService] Error fetching data for AppID ${appId}:`, error)
+      console.error(`[SteamGameInfo] Error fetching data for AppID ${appId}:`, error)
       return null
     }
   }
