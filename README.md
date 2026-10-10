@@ -12,7 +12,7 @@ Trello Board ➔ Front-End (GitHub Pages) ➔ Cloudflare Worker Proxy ➔ Steam 
 
 2. Front-End: Static HTML/JS ES6 modules (this project) exposed by Github Pages through URL _https://maxime-limosin.github.io/Trello-Steam-game-info_
 
-3. Proxy (Cloudflare Worker): Bypasses browser CORS restrictions, fetches Steam data, and formats responses in English (_cloudflare-proxy.js_ file)
+3. Proxy (Cloudflare Worker): Bypasses browser CORS restrictions, fetches Steam data, and formats responses in English (_cloudflare-worker-proxy.js_ file)
 
 4. Steam API: Provides a JSON when given an [_appId_](https://store.steampowered.com/api/appdetails?appids=230410)
 
